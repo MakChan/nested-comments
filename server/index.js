@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import serverless from "serverless-http";
 import bodyParser from "body-parser";
+import cors from "cors";
 import jwt from "jsonwebtoken";
 
 import models, { sequelize } from "./models";
@@ -9,6 +10,7 @@ import routes from "./routes";
 
 const app = express();
 
+app.use(cors());
 app.use(bodyParser.json());
 
 const getMe = async req => {

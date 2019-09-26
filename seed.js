@@ -1,4 +1,4 @@
-const createUsersWithPostsAndComments = async models => {
+const seedDb = async models => {
   await models.User.create(
     {
       username: "mayank",
@@ -68,4 +68,4 @@ const createUsersWithPostsAndComments = async models => {
   
 };
 
-export { createUsersWithPostsAndComments };
+export { seedDb };

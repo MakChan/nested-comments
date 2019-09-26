@@ -1,25 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
 
-function App() {
+const dateOptions = {
+  weekday: "long",
+  year: "numeric",
+  month: "long",
+  day: "numeric"
+};
+
+const Comment = ({ comment }) => {
+  const date = new Date(comment.createdat);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ marginLeft: "10" * comment.path.length, marginBottom: "5px" }}>
+      <div>
+        <b>{comment.text}</b>
+      </div>
+      <div>
+        {comment.authorname} - <i>{date.toLocaleDateString("en-IN", dateOptions)}</i>
+      </div>
     </div>
+  );
+};
+function App() {
+  const [comments, setComments] = useState([]);
+  useEffect(() => {
+    fetch(
+      "http://localhost:3000/.netlify/functions/server/comments/2/recursive"
+    )
+      .then(comments => comments.json())
+      .then(comments => {
+        setComments(comments);
+      });
+  }, []);
+
+  return (
+    <>
+      <h2>Comments</h2>
+      {comments.map(comment => (
+        <Comment comment={comment} key={comment.id} />
+      ))}
+    </>
   );
 }
 

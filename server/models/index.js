@@ -19,6 +19,5 @@ Object.keys(models).forEach(key => {
   }
 });
 
-console.log('models ==>', models); // TODO: remove this
 export { sequelize };
 export default models;
