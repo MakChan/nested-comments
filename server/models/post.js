@@ -6,6 +6,7 @@ const post = (sequelize, DataTypes) => {
 
   Post.associate = models => {
     Post.hasMany(models.Comment);
+    Post.belongsTo(models.User);
   };
 
   return Post;

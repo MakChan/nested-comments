@@ -6,6 +6,7 @@ const router = Router();
 const createToken = async (user, expiresIn) => {
   const secret = process.env.SECRET;
   const { id, name, username } = user;
+  console.log("secret, id, name, username ==>", secret, id, name, username); // TODO: remove this
   return await jwt.sign({ id, name, username }, secret, {
     expiresIn
   });
@@ -21,26 +22,31 @@ router.get("/:userId", async (req, res) => {
   return res.send(user);
 });
 
-router.post("/signup", async (req, res) => {
+router.post("/register", async (req, res) => {
   const user = await req.context.models.User.create({
     username: req.body.username,
     name: req.body.name,
     password: req.body.password
   });
-  return { token: createToken(user, "30d"), user };
+  return res.send({ token: await createToken(user, "30d"), user });
 });
 
-router.post("/signin", async (req, res) => {
-  const user = await req.context.models.User.findByLogin(req.body.username);
+router.post("/login", async (req, res) => {
+  console.log("req.body ==>", req.body); // TODO: remove this
+
+  const user = await req.context.models.User.scope("withPassword").findOne({
+    where: { username: req.body.username }
+  });
   if (!user) {
-    res.status(400).send("No user found with this login credentials.");
+    return res.status(404).send("No user found with this login credentials.");
   }
 
   const isValid = await user.validatePassword(req.body.password);
   if (!isValid) {
-    res.status(401).send("No user found with this login credentials.");
+    return res.status(401).send("Wrong credentials.");
   }
-  return { token: createToken(user, "30d"), user };
+
+  return res.send({ token: await createToken(user, "30d"), user });
 });
 
 export default router;

@@ -1,8 +1,27 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import { ThemeProvider } from "theme-ui";
+import rebass  from "@rebass/preset";
+import { swiss } from '@theme-ui/presets'
+import merge from 'lodash.merge'
+
+import App from "./App";
+import * as serviceWorker from "./serviceWorker";
+import { UserProvider } from "./utils/authContext";
+
+const theme = merge({}, rebass, swiss)
+
+ReactDOM.render(
+  <Router>
+    <UserProvider>
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
+    </UserProvider>
+  </Router>,
+  document.getElementById("root")
+);
 
 serviceWorker.unregister();

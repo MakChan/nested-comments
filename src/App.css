@@ -1,2 +1,14 @@
 @import-normalize;
 
+body {
+  font-size: 14px;
+  font-family: "Work Sans", "Lucida Sans", "Lucida Sans Regular",
+    "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  /* background-color: #f5f6f8; */
+  background-color: var(--theme-ui-colors-background,hsl(10,10%,98%));
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+}

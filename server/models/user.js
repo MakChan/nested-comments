@@ -16,6 +16,11 @@ const user = (sequelize, DataTypes) => {
     {
       defaultScope: {
         attributes: { exclude: ["password"] }
+      },
+      scopes: {
+        withPassword: {
+          attributes: {}
+        }
       }
     }
   );
@@ -23,13 +28,6 @@ const user = (sequelize, DataTypes) => {
   User.associate = models => {
     User.hasMany(models.Post);
     User.hasMany(models.Comment);
-  };
-
-  User.findByLogin = async login => {
-    let user = await User.findOne({
-      where: { username: login }
-    });
-    return user;
   };
 
   User.beforeCreate(async user => {
@@ -44,6 +42,13 @@ const user = (sequelize, DataTypes) => {
   User.prototype.validatePassword = async function(password) {
     if (!this.password) return false;
     return await bcrypt.compare(password, this.password);
+  };
+
+  User.prototype.toJSON = function() {
+    let values = Object.assign({}, this.get());
+
+    delete values.password;
+    return values;
   };
 
   return User;

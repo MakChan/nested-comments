@@ -3,37 +3,47 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/runtime": "^7.6.2",
+    "@emotion/core": "^10.0.17",
+    "@mdx-js/react": "^1.5.0",
+    "@rebass/forms": "^4.0.6",
+    "@rebass/preset": "^4.0.5",
+    "@theme-ui/presets": "^0.2.42",
+    "axios": "^0.19.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "concurrently": "^4.1.2",
     "cors": "^2.8.5",
     "dotenv-webpack": "^1.7.0",
+    "emotion-theming": "^10.0.19",
     "express": "^4.17.1",
+    "final-form": "^4.18.5",
     "jsonwebtoken": "^8.5.1",
+    "lodash.merge": "^4.6.2",
     "netlify-lambda": "^1.6.3",
+    "node-sass": "^4.12.0",
     "nodemon": "^1.19.2",
     "npm-run-all": "^4.1.5",
     "pg": "^7.12.1",
     "pg-hstore": "^2.3.3",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
+    "react": "^16.10.0",
+    "react-dom": "^16.10.0",
+    "react-final-form": "^6.3.0",
+    "react-router-dom": "^5.1.1",
     "react-scripts": "3.1.2",
-    "sequelize": "^5.19.0",
+    "react-timeago": "^4.4.0",
+    "rebass": "^4.0.6",
+    "sequelize": "^5.19.1",
     "serverless-http": "^2.3.0",
+    "theme-ui": "^0.2.43",
     "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
     "start:client": "react-scripts start",
     "build:client": "react-scripts build",
     "test:client": "react-scripts test",
-    "start:server": "nodemon --exec babel-node server-local.js",
+    "start:server": "nodemon --ignore 'src/' --exec babel-node server-local.js",
     "start": "concurrently -n client,server \"yarn start:client\" \"yarn start:server\""
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "src/*"
-    ],
-    "delay": "2500"
   },
   "eslintConfig": {
     "extends": "react-app"

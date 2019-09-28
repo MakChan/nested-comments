@@ -4,13 +4,13 @@ const sequelize = new Sequelize(
   process.env.DATABASE,
   process.env.DATABASE_USER,
   process.env.DATABASE_PASSWORD,
-  { host: "localhost", port: "5432", dialect: "postgres" }
+  { host: "localhost", port: "5432", dialect: "postgres", logging: false }
 );
 
 const models = {
   Comment: sequelize.import("./comment"),
   Post: sequelize.import("./post"),
-  User: sequelize.import("./user"),
+  User: sequelize.import("./user")
 };
 
 Object.keys(models).forEach(key => {

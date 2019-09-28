@@ -38,6 +38,7 @@ app.use(async (req, res, next) => {
 
 app.use("/.netlify/functions/server/users", routes.user);
 app.use("/.netlify/functions/server/comments", routes.comment);
+app.use("/.netlify/functions/server/posts", routes.post);
 // app.use("/users", routes.user);
 // app.use("/messages", routes.message);
 
