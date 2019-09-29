@@ -28,12 +28,12 @@ const seedDb = async models => {
       comments: [
         {
           text: "First Comment",
-          depth: 1,
+          depth: 0,
           userId: 1
         },
         {
           text: "Second Comment",
-          depth: 1,
+          depth: 0,
           userId: 2
         }
       ]
@@ -48,24 +48,23 @@ const seedDb = async models => {
       postId: 2,
       userId: 2,
       parentId: 1,
-      depth: 2
+      depth: 1
     },
     {
       text: "Second Nested Comment",
       postId: 2,
       userId: 2,
       parentId: 2,
-      depth: 2
+      depth: 1
     },
     {
       text: "Third Nested Comment",
       postId: 2,
       userId: 1,
       parentId: 3,
-      depth: 3
+      depth: 2
     }
   ]);
-  
 };
 
 export { seedDb };

@@ -18,19 +18,15 @@ export const UserProvider = props => {
     const token = localStorage.getItem("x-token");
 
     if (token && token !== "undefined") {
-      console.log("token ==>", token); // TODO: remove this
       const user = JSON.parse(localStorage.getItem("user"));
-      console.log("user ==>", user); // TODO: remove this
       setUserState({
         loaded: true,
         user
       });
-      // console.log('userState ==>', userState); // TODO: remove this
     } else
       setUserState({
         loaded: true
       });
-    // console.log("userState ==>", userState); // TODO: remove this
   }, []);
 
   const setUser = data => {
@@ -45,7 +41,6 @@ export const UserProvider = props => {
     history.push("/login");
   };
 
-  console.log("userState ==>", userState); // TODO: remove this
   return (
     <AuthContext.Provider
       value={{

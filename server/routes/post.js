@@ -1,9 +1,9 @@
 import { Router } from "express";
+import { requiresLogin } from "./auth";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
-  console.log("req.context.models.Post ==>", req.context.models.Post); // TODO: remove this
   const posts = await req.context.models.Post.findAll({
     attributes: {
       include: [
@@ -23,32 +23,52 @@ router.get("/", async (req, res) => {
         model: req.context.models.Comment,
         attributes: []
       }
-    ]
+    ],
+    order: [["createdAt", "DESC"]]
   });
 
   return res.send(posts);
 });
 
+router.post("/", requiresLogin, async (req, res) => {
+  const post = await req.context.models.Post.create({
+    text: req.body.text,
+    title: req.body.title,
+    userId: req.context.me.id
+  });
+
+  return res.send(post);
+});
+
 router.get("/:postId", async (req, res) => {
+  const postId = Number(req.params.postId);
+
+  if (!postId)
+    return res.status(400).send({ message: "Invalid post identifier." });
+
   const post = await req.context.models.Post.findOne({
-    where: { id: req.params.postId },
+    where: { id: postId },
     include: [{ model: req.context.models.User }]
   });
 
+  if (!post)
+    return res.status(404).send({ message: "No post with this identifier." });
+
   const query = `
-    WITH RECURSIVE cte (path, pathString, id, userId, authorName, createdAt, text, postId, parentId) AS (
+    WITH RECURSIVE cte (path, pathString, id, "userId", "authorName", "createdAt", depth, text, "postId", "parentId") AS (
       SELECT ARRAY[C1.id], 
         C1.id::text,
         C1.id,
         "userId",
         users.name,
         C1."createdAt",
+        depth,
         text,
         "postId",
         "parentId"
       FROM comments C1
 		  INNER JOIN users ON ("userId" = users.id)
-      WHERE "parentId" IS NULL AND "postId" = ${req.params.postId}
+      WHERE "parentId" IS NULL AND "postId" = ${postId}
 
       UNION ALL
 
@@ -58,6 +78,7 @@ router.get("/:postId", async (req, res) => {
         "comments"."userId",
         users.name,
         "comments"."createdAt",
+        comments.depth,
         comments.text,
         "comments"."postId",
         "comments"."parentId"

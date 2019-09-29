@@ -11,6 +11,8 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { UserProvider } from "./utils/authContext";
 
+import "./index.css"
+
 const theme = merge({}, rebass, swiss)
 
 ReactDOM.render(

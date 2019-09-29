@@ -1,21 +1,29 @@
 import React from "react";
-import { Box, Flex, Link, Heading, Text, Button } from "rebass";
+import { Link as RouterLink } from "react-router-dom";
+import { Box, Flex, Link, Button } from "rebass";
 
 const Header = ({ user, logOut }) => {
   return (
-    <Flex px={2} color="white" bg="black" alignItems="center" as="nav">
-      {/* <Text p={2} fontWeight="bold">
-        Nested Comments
-      </Text> */}
-      <span>Hi {user.name}</span>
+    <Flex p={2} color="white" bg="black" alignItems="center" as="nav">
+      <Link to="/" color="#FFF" mr={2} as={RouterLink}>
+        Home
+      </Link>
+      <Link to="/post/create" color="#FFF" as={RouterLink}>
+        Create Post
+      </Link>
       <Box mx="auto" />
-      {/* <Link variant="nav" href="#!">
-        Posts
-      </Link> */}
+      <span>Hi {user.name}</span>
       <Button
         onClick={logOut}
         color="accent"
-        sx={{ backgroundColor: "transparent" }}
+        sx={{
+          backgroundColor: "transparent",
+          padding: 0,
+          fontSize: 1,
+          fontWeight: 500,
+          textDecoration: "underline",
+          marginLeft: 2
+        }}
       >
         Log out
       </Button>

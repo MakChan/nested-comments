@@ -1,7 +1,6 @@
 import { API_URL } from "./constants";
 
 async function http(url = "", method = "GET", data = "") {
-  // Default options are marked with *
   const options = {
     method: method,
     headers: {
@@ -10,9 +9,19 @@ async function http(url = "", method = "GET", data = "") {
     },
     body: method === "POST" ? JSON.stringify(data) : undefined
   };
-  console.log('options ==>', options); // TODO: remove this
+
   const response = await fetch(API_URL + url, options);
-  return await response.json();
+
+  return new Promise(async (resolve, reject) => {
+    if (response.status === 200) return resolve(response.json());
+    else {
+      const error = await response.json();
+      reject({
+        message: error.message,
+        status: response.status
+      });
+    }
+  });
 }
 
 export default http;

@@ -1,23 +1,19 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
-import axios from "axios";
 
-import { Label, Input, Select, Textarea, Radio, Checkbox } from "@rebass/forms";
-import { Box, Flex, Heading, Text, Card, Button } from "rebass";
+import { Label, Input } from "@rebass/forms";
+import { Box, Button } from "rebass";
 import { Form, Field } from "react-final-form";
 import { useAuthContext } from "../utils/authContext";
 import http from "../utils/http";
-
-const required = value => (value ? undefined : "Required");
+import { required } from "../utils/validations";
 
 const Login = () => {
   const history = useHistory();
   const { setUser } = useAuthContext();
 
   const onSubmit = async formData => {
-    console.log("formData ==>", formData); // TODO: remove this
     const data = await http("users/login", "POST", formData);
-    console.log("data ==>", data); // TODO: remove this
     setUser(data);
 
     history.push("/");
