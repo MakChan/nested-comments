@@ -55,13 +55,14 @@ router.get("/:postId", async (req, res) => {
     return res.status(404).send({ message: "No post with this identifier." });
 
   const query = `
-    WITH RECURSIVE cte (path, pathString, id, "userId", "authorName", "createdAt", depth, text, "postId", "parentId") AS (
+    WITH RECURSIVE cte (path, pathString, id, "userId", "authorName", "createdAt", "updatedAt", depth, text, "postId", "parentId") AS (
       SELECT ARRAY[C1.id], 
         C1.id::text,
         C1.id,
         "userId",
         users.name,
         C1."createdAt",
+        C1."updatedAt",
         depth,
         text,
         "postId",
@@ -78,6 +79,7 @@ router.get("/:postId", async (req, res) => {
         "comments"."userId",
         users.name,
         "comments"."createdAt",
+        "comments"."updatedAt",
         comments.depth,
         comments.text,
         "comments"."postId",

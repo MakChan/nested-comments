@@ -7,7 +7,7 @@ async function http(url = "", method = "GET", data = "") {
       "Content-Type": "application/json",
       "x-token": localStorage.getItem("x-token") || ""
     },
-    body: method === "POST" ? JSON.stringify(data) : undefined
+    body: method === "GET" ? undefined : JSON.stringify(data)
   };
 
   const response = await fetch(API_URL + url, options);

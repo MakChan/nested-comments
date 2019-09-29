@@ -12,9 +12,7 @@ const CreatePost = () => {
   const history = useHistory();
 
   const handleSubmit = async formData => {
-    console.log("formData ==>", formData); // TODO: remove this
     const post = await http("posts/", "POST", formData);
-    console.log("post ==>", post); // TODO: remove this
     history.push("/post/" + post.id);
   };
   return (

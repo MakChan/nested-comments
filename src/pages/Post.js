@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
-import { Heading, Box, Text } from "rebass";
+import { Heading, Box, Text, Button } from "rebass";
 import TimeAgo from "react-timeago";
 
 import { useAuthContext } from "../utils/authContext";
@@ -58,8 +58,6 @@ function PostPage() {
   };
 
   const hideChildComments = comment => {
-    // TODO: Would it be better if index is passed from the comments list?
-
     const comments = post.comments.slice();
     const index = comments.findIndex(com => com.id === comment.id);
 
@@ -73,7 +71,6 @@ function PostPage() {
         ) {
           comments[i].hide = true;
           if (!comments[i].hiddenBy) {
-            // console.log('comments[i].hiddenBy ==>', comments[i].id, comments[i].hiddenBy); // TODO: remove this
             comments[i].hiddenBy = comment.id;
           }
           comments[index].childrenCount += 1;
@@ -81,16 +78,11 @@ function PostPage() {
       }
     } else {
       comments[index].hideContent = false;
-      // let skipPathString = "";
       for (let i = index + 1; i < comments.length; i++) {
         if (
           comments[i].path[0] === comment.path[0] &&
           comments[i].depth > comment.depth
         ) {
-          // if (comments[i].hideContent) {
-          //   skipPathString = comments[i].pathstring;
-          // } else if (comments[i].pathstring.startsWith(skipPathString))
-          //   continue;
           if (comments[i].hiddenBy === comment.id) {
             comments[i].hide = false;
             comments[i].hiddenBy = undefined;
@@ -113,7 +105,20 @@ function PostPage() {
         </Heading>
         <div>
           By {post.user.username} <TimeAgo date={post.createdAt} /> |{" "}
-          {post.comments.length} comments
+          {post.comments.length} comments |
+          {userState.user.id === post.userId && (
+            <Button
+              fontSize="1"
+              py={0}
+              px={1}
+              fontWeight="500"
+              color="gray"
+              variant="outline"
+              ml={2}
+            >
+              edit
+            </Button>
+          )}
         </div>
         <Text mt={2} fontSize={1}>
           {post.text}
@@ -133,6 +138,7 @@ function PostPage() {
                   key={comment.id}
                   hideChildComments={hideChildComments}
                   addChildComment={addChildComment}
+                  userId={userState.user.id}
                 />
               )
           )}
