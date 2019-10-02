@@ -1,6 +1,6 @@
 const comment = (sequelize, DataTypes) => {
   const Comment = sequelize.define("comment", {
-    text: DataTypes.STRING,
+    text: DataTypes.TEXT,
     depth: DataTypes.INTEGER
   });
 

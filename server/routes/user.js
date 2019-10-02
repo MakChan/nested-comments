@@ -31,17 +31,18 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-
   const user = await req.context.models.User.scope("withPassword").findOne({
     where: { username: req.body.username }
   });
   if (!user) {
-    return res.status(404).send("No user found with this login credentials.");
+    return res
+      .status(404)
+      .send({ message: "No user found with these login credentials." });
   }
 
   const isValid = await user.validatePassword(req.body.password);
   if (!isValid) {
-    return res.status(401).send("Wrong credentials.");
+    return res.status(401).send({ message: "Wrong credentials." });
   }
 
   return res.send({ token: await createToken(user, "30d"), user });

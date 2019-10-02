@@ -1,26 +1,35 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
-import { Label, Input} from "@rebass/forms";
-import { Box, Button } from "rebass";
+import { Label, Input } from "@rebass/forms";
+import { Box } from "rebass";
 import { Form, Field } from "react-final-form";
+import { FORM_ERROR } from "final-form";
 
 import http from "../utils/http";
 import { useAuthContext } from "../utils/authContext";
 import { required } from "../utils/validations";
+
+import Button from "../components/LoadingButton";
 
 const Register = () => {
   const history = useHistory();
   const { setUser } = useAuthContext();
 
   const onSubmit = async formData => {
-    const data = await http("users/register", "POST", formData);
-    setUser(data);
+    try {
+      const data = await http("users/register", "POST", formData);
+      setUser(data);
+    } catch (e) {
+      return {
+        [FORM_ERROR]: e.message
+      };
+    }
 
     history.push("/");
   };
   return (
     <Form onSubmit={onSubmit}>
-      {({ handleSubmit }) => (
+      {({ handleSubmit, submitError, submitting }) => (
         <form onSubmit={handleSubmit}>
           <Field name="name" validate={required}>
             {({ input, meta }) => (
@@ -57,8 +66,19 @@ const Register = () => {
               </Box>
             )}
           </Field>
+          {submitError && (
+            <Box color="red" mb={3}>
+              {submitError}
+            </Box>
+          )}
+
           <Box ml="auto">
-            <Button type="submit" variant="secondary" mr={3}>
+            <Button
+              type="submit"
+              variant="secondary"
+              isLoading={submitting}
+              mr={3}
+            >
               Register
             </Button>
             <Link to="/login">Login</Link>

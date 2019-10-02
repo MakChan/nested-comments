@@ -9,7 +9,7 @@ import http from "../utils/http";
 import Comment from "../components/Comment";
 import Reply from "../components/Reply";
 import Error from "../components/Error";
-import Edit from "../components/Edit";
+import TextWithEdit from "../components/TextWithEdit";
 
 import LinkButton from "../components/LinkButton";
 
@@ -34,6 +34,7 @@ function PostPage() {
     };
 
     fetchPost(postId);
+    // eslint-disable-next-line
   }, [postId]);
 
   const addComment = async ({ text }) => {
@@ -59,6 +60,8 @@ function PostPage() {
 
     comments.splice(index + 1, 0, result);
     setPost({ ...post, comments: comments });
+
+    return true;
   };
 
   const hideChildComments = comment => {
@@ -113,21 +116,29 @@ function PostPage() {
         <Heading fontSize={[2, 2, 3]} mb={1} color="secondary">
           {post.title}
         </Heading>
-        <div>
-          By {post.user.username} <TimeAgo date={post.createdAt} /> |{" "}
+        <Box mb={2}>
+          By {post.user.username} <TimeAgo date={post.createdAt} />
+          {post.createdAt !== post.updatedAt && (
+            <>
+              {" | "}
+              <Text fontSize="12px" as="span">
+                (updated <TimeAgo date={post.updatedAt} />)
+              </Text>
+            </>
+          )}
+          {" | "}
           {post.comments.length} comments
           {userState.user.id === post.userId && (
             <LinkButton ml={2} onClick={() => setEditing(true)}>
               edit
             </LinkButton>
           )}
-        </div>
-        {isEditing && <Edit onSubmit={editPost} text={post.text} />}
-        {!isEditing && (
-          <Text mt={2} fontSize={1} sx={{ whiteSpace: "pre-wrap" }}>
-            {post.text}
-          </Text>
-        )}
+        </Box>
+        <TextWithEdit
+          isEditing={isEditing}
+          onSubmit={editPost}
+          text={post.text}
+        />
       </Box>
 
       <Reply handleSubmit={addComment} />

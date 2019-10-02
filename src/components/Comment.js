@@ -6,18 +6,22 @@ import TimeAgo from "react-timeago";
 import http from "../utils/http";
 
 import Reply from "./Reply";
-import Edit from "./Edit";
+import TextWithEdit from "./TextWithEdit";
 
 import LinkButton from "./LinkButton";
+import CommentLoader from "./ContentLoader";
 
 const Comment = ({ comment, hideChildComments, addChildComment, userId }) => {
   const [showReply, toggleReply] = useState(false);
   const [isEditing, setEditing] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [_comment, setComment] = useState(comment);
 
-  const replyComment = formData => {
-    addChildComment(comment, formData.text);
+  const replyComment = async formData => {
     toggleReply(false);
+    setLoading(true);
+    await addChildComment(comment, formData.text);
+    setLoading(false);
   };
 
   const editComment = async formData => {
@@ -27,58 +31,62 @@ const Comment = ({ comment, hideChildComments, addChildComment, userId }) => {
   };
 
   return (
-    <Box
-      my={3}
-      p={2}
-      ml={`${15 * (_comment.path.length - 1)}px`}
-      sx={{
-        borderLeft: "2px solid #777777",
-        boxShadow: "1px 1px 10px #d6d6d673"
-      }}
-    >
-      <Text color="text">
-        {_comment.authorName} <TimeAgo date={_comment.createdAt} />{" "}
-        {_comment.createdAt !== _comment.updatedAt && (
-          <Text fontSize="12px" as="span">
-            (updated <TimeAgo date={_comment.updatedAt} />)
-          </Text>
-        )}{" "}
-        <Box
-          onClick={() => hideChildComments(_comment)}
-          sx={{ all: "unset", cursor: "pointer" }}
-          as="button"
-        >
-          [
-          {_comment.hideContent && _comment.childrenCount
-            ? "+" + _comment.childrenCount
-            : "-"}
-          ]
-        </Box>
-      </Text>
-      {!_comment.hideContent && (
-        <>
-          {isEditing && <Edit onSubmit={editComment} text={_comment.text} />}
-          {!isEditing && (
-            <>
-              <Text py={2} sx={{ whiteSpace: "pre-wrap" }}>
-                {_comment.text}
-              </Text>
-              <Flex mb={1}>
-                <LinkButton onClick={() => toggleReply(!showReply)}>
-                  reply
-                </LinkButton>
-                {userId === _comment.userId && (
-                  <LinkButton ml={2} onClick={() => setEditing(true)}>
-                    edit
+    <Box my={3} ml={`${15 * (_comment.path.length - 1)}px`}>
+      <Box
+        p={2}
+        sx={{
+          borderLeft: "2px solid #777777",
+          boxShadow: "1px 1px 10px #d6d6d673"
+        }}
+      >
+        <Text color="text">
+          {_comment.authorName} <TimeAgo date={_comment.createdAt} />{" "}
+          {_comment.createdAt !== _comment.updatedAt && (
+            <Text fontSize="12px" as="span">
+              (updated <TimeAgo date={_comment.updatedAt} />)
+            </Text>
+          )}{" "}
+          <Box
+            onClick={() => hideChildComments(_comment)}
+            sx={{ all: "unset", cursor: "pointer" }}
+            as="button"
+          >
+            [
+            {_comment.hideContent && _comment.childrenCount
+              ? "+" + _comment.childrenCount
+              : "-"}
+            ]
+          </Box>
+        </Text>
+        {!_comment.hideContent && (
+          <>
+            <TextWithEdit
+              isEditing={isEditing}
+              onSubmit={editComment}
+              text={_comment.text}
+            />
+            {!isEditing && (
+              <>
+                <Flex mb={1}>
+                  <LinkButton onClick={() => toggleReply(!showReply)}>
+                    reply
                   </LinkButton>
-                )}
-              </Flex>
-            </>
-          )}
+                  {userId === _comment.userId && (
+                    <LinkButton ml={2} onClick={() => setEditing(true)}>
+                      edit
+                    </LinkButton>
+                  )}
+                </Flex>
+              </>
+            )}
 
-          {showReply && <Reply handleSubmit={replyComment} autoFocus={true} />}
-        </>
-      )}
+            {showReply && (
+              <Reply handleSubmit={replyComment} autoFocus={true} />
+            )}
+          </>
+        )}
+      </Box>
+      {isLoading && <CommentLoader style={{ marginLeft: "10px" }} />}
     </Box>
   );
 };

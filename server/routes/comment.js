@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requiresLogin } from "./auth";
+import { requiresLogin } from "../utils";
 
 const router = Router();
 

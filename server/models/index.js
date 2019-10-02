@@ -1,4 +1,7 @@
 import Sequelize from "sequelize";
+import User from "./user";
+import Comment from "./comment";
+import Post from "./post";
 
 const sequelize = new Sequelize(
   process.env.DATABASE_NAME,
@@ -13,9 +16,9 @@ const sequelize = new Sequelize(
 );
 
 const models = {
-  Comment: sequelize.import("./comment"),
-  Post: sequelize.import("./post"),
-  User: sequelize.import("./user")
+  Comment: sequelize.import("Comment", Comment),
+  Post: sequelize.import("Post", Post),
+  User: sequelize.import("User", User)
 };
 
 Object.keys(models).forEach(key => {

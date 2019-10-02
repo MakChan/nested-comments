@@ -67,4 +67,4 @@ const seedDb = async models => {
   ]);
 };
 
-export { seedDb };
+export default seedDb;

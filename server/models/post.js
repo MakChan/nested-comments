@@ -1,7 +1,7 @@
 const post = (sequelize, DataTypes) => {
   const Post = sequelize.define("post", {
     title: DataTypes.STRING,
-    text: DataTypes.STRING
+    text: DataTypes.TEXT
   });
 
   Post.associate = models => {

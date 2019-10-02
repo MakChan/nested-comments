@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import serverless from "serverless-http";
+
 import bodyParser from "body-parser";
 import cors from "cors";
 import jwt from "jsonwebtoken";
@@ -33,13 +34,29 @@ app.use(async (req, res, next) => {
     sequelize,
     me
   };
+
   next();
 });
 
-app.use("/.netlify/functions/server/users", routes.user);
-app.use("/.netlify/functions/server/comments", routes.comment);
-app.use("/.netlify/functions/server/posts", routes.post);
+app.use("/.netlify/functions/index/users", routes.user);
+app.use("/.netlify/functions/index/posts", routes.post);
+app.use("/.netlify/functions/index/comments", routes.comment);
 
-module.exports = app;
+const connection = {};
+const connectToDatabase = async () => {
+  if (connection.isConnected) return models;
 
-module.exports.handler = serverless(app);
+  await sequelize.sync();
+  await sequelize.authenticate();
+  connection.isConnected = true;
+  return models;
+};
+
+export async function handler(event, context) {
+  context.callbackWaitsForEmptyEventLoop = true;
+  await connectToDatabase();
+
+  const serverlessHandler = serverless(app);
+
+  return await serverlessHandler(event, context);
+}
