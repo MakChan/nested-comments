@@ -1,4 +1,6 @@
 import Sequelize from "sequelize";
+import pg from "pg";
+
 import User from "./user";
 import Comment from "./comment";
 import Post from "./post";
@@ -11,7 +13,7 @@ const sequelize = new Sequelize(
     host: process.env.DATABASE_HOST,
     port: process.env.DATABASE_PORT,
     dialect: "postgres",
-    logging: false
+    dialectModule: pg
   }
 );
 
