@@ -41,8 +41,6 @@ router.put("/:commentId", requiresLogin, async (req, res) => {
   if (comment.userId !== req.context.me.id)
     return res.status(401).send({ message: "Not authorized." });
 
-  console.log("comment ==>", comment); // TODO: remove this
-    console.log('req.body.text ==>', req.body.text); // TODO: remove this
   try {
     await comment.update({ text: req.body.text });
     return res.send(comment);

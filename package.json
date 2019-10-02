@@ -42,7 +42,9 @@
     "build:client": "react-scripts build",
     "test:client": "react-scripts test",
     "start:server": "nodemon --ignore 'src/' --exec babel-node server-local.js",
-    "start": "concurrently -n client,server \"yarn start:client\" \"yarn start:server\""
+    "start": "concurrently -n client,server \"yarn start:client\" \"yarn start:server\"",
+    "build:lambda": "netlify-lambda install && netlify-lambda build server --config ./webpack.prod.functions.js",
+    "build": "run-s build:**"
   },
   "eslintConfig": {
     "extends": "react-app"

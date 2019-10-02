@@ -1,23 +1,14 @@
 import React, { useState } from "react";
 
-import { Box, Text, Button, Flex } from "rebass";
-import { Textarea, Input, Label } from "@rebass/forms";
+import { Box, Text, Flex } from "rebass";
 import TimeAgo from "react-timeago";
-import { Form, Field } from "react-final-form";
 
 import http from "../utils/http";
-import { required } from "../utils/validations";
 
 import Reply from "./Reply";
+import Edit from "./Edit";
 
-const buttonProps = {
-  fontSize: "1",
-  py: 0,
-  px: 1,
-  fontWeight: "500",
-  color: "gray",
-  variant: "outline"
-};
+import LinkButton from "./LinkButton";
 
 const Comment = ({ comment, hideChildComments, addChildComment, userId }) => {
   const [showReply, toggleReply] = useState(false);
@@ -66,51 +57,20 @@ const Comment = ({ comment, hideChildComments, addChildComment, userId }) => {
       </Text>
       {!_comment.hideContent && (
         <>
-          {isEditing && (
-            <Form
-              onSubmit={editComment}
-              initialValues={{ text: _comment.text }}
-            >
-              {({ handleSubmit }) => (
-                <form onSubmit={handleSubmit}>
-                  <Field name="text" validate={required} autoFocus={true}>
-                    {({ input, meta }) => (
-                      <>
-                        <Textarea
-                          {...input}
-                          my={1}
-                          width={[1, 1 / 3, 1 / 4]}
-                          autoFocus={true}
-                        />
-                        {meta.touched && meta.error && (
-                          <Box color="red">{meta.error}</Box>
-                        )}
-                      </>
-                    )}
-                  </Field>
-                  <Button {...buttonProps}>save</Button>
-                </form>
-              )}
-            </Form>
-          )}
+          {isEditing && <Edit onSubmit={editComment} text={_comment.text} />}
           {!isEditing && (
             <>
-              <Text py={2}>{_comment.text}</Text>
+              <Text py={2} sx={{ whiteSpace: "pre-wrap" }}>
+                {_comment.text}
+              </Text>
               <Flex mb={1}>
-                <Button
-                  {...buttonProps}
-                  onClick={() => toggleReply(!showReply)}
-                >
+                <LinkButton onClick={() => toggleReply(!showReply)}>
                   reply
-                </Button>
+                </LinkButton>
                 {userId === _comment.userId && (
-                  <Button
-                    {...buttonProps}
-                    ml={2}
-                    onClick={() => setEditing(true)}
-                  >
+                  <LinkButton ml={2} onClick={() => setEditing(true)}>
                     edit
-                  </Button>
+                  </LinkButton>
                 )}
               </Flex>
             </>

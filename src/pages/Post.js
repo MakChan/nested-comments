@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
-import { Heading, Box, Text, Button } from "rebass";
+import { Heading, Box, Text } from "rebass";
 import TimeAgo from "react-timeago";
 
 import { useAuthContext } from "../utils/authContext";
 import http from "../utils/http";
-
 import Comment from "../components/Comment";
 import Reply from "../components/Reply";
 import Error from "../components/Error";
+import Edit from "../components/Edit";
+
+import LinkButton from "../components/LinkButton";
 
 function PostPage() {
   const { userState } = useAuthContext();
   const history = useHistory();
   let { postId } = useParams();
+
   const [post, setPost] = useState(null);
   const [error, setError] = useState(false);
+  const [isEditing, setEditing] = useState(false);
 
   useEffect(() => {
     const fetchPost = async postId => {
@@ -94,6 +98,12 @@ function PostPage() {
     setPost({ ...post, comments: comments });
   };
 
+  const editPost = async formData => {
+    const result = await http("posts/" + postId, "PUT", formData);
+    setPost({ ...post, text: result.text, updatedAt: result.updatedAt });
+    setEditing(false);
+  };
+
   if (error) return <Error />;
   if (!post) return "Loading";
 
@@ -105,24 +115,19 @@ function PostPage() {
         </Heading>
         <div>
           By {post.user.username} <TimeAgo date={post.createdAt} /> |{" "}
-          {post.comments.length} comments |
+          {post.comments.length} comments
           {userState.user.id === post.userId && (
-            <Button
-              fontSize="1"
-              py={0}
-              px={1}
-              fontWeight="500"
-              color="gray"
-              variant="outline"
-              ml={2}
-            >
+            <LinkButton ml={2} onClick={() => setEditing(true)}>
               edit
-            </Button>
+            </LinkButton>
           )}
         </div>
-        <Text mt={2} fontSize={1}>
-          {post.text}
-        </Text>
+        {isEditing && <Edit onSubmit={editPost} text={post.text} />}
+        {!isEditing && (
+          <Text mt={2} fontSize={1} sx={{ whiteSpace: "pre-wrap" }}>
+            {post.text}
+          </Text>
+        )}
       </Box>
 
       <Reply handleSubmit={addComment} />

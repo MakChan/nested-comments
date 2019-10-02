@@ -39,30 +39,7 @@ app.use(async (req, res, next) => {
 app.use("/.netlify/functions/server/users", routes.user);
 app.use("/.netlify/functions/server/comments", routes.comment);
 app.use("/.netlify/functions/server/posts", routes.post);
-// app.use("/users", routes.user);
-// app.use("/messages", routes.message);
 
 module.exports = app;
 
 module.exports.handler = serverless(app);
-
-// export async function handler(event, context) {
-//   context.callbackWaitsForEmptyEventLoop = false;
-
-//   // const db = await connectDb();
-// //   conn = await connectDb(conn);
-
-// //   console.log("connected ==>"); // TODO: remove this
-
-//   return serverless(app)
-
-// //   return new Promise((yay, nay) => {
-// //     const cb = (err, args) => (err ? nay(err) : yay(args));
-// //     server.createHandler({
-// //       cors: {
-// //         origin: true,
-// //         credentials: true
-// //       }
-// //     })(event, context, cb);
-// //   });
-// }

@@ -40,6 +40,23 @@ router.post("/", requiresLogin, async (req, res) => {
   return res.send(post);
 });
 
+router.put("/:postId", requiresLogin, async (req, res) => {
+  const post = await req.context.models.Post.findByPk(req.params.postId);
+
+  if (!post)
+    return res.status(404).send({ message: "No post with this identifier." });
+
+  if (post.userId !== req.context.me.id)
+    return res.status(401).send({ message: "Not authorized." });
+
+  try {
+    await post.update({ text: req.body.text });
+    return res.send(post);
+  } catch (e) {
+    return res.status(500).send(e);
+  }
+});
+
 router.get("/:postId", async (req, res) => {
   const postId = Number(req.params.postId);
 

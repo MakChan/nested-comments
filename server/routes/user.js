@@ -6,7 +6,6 @@ const router = Router();
 const createToken = async (user, expiresIn) => {
   const secret = process.env.SECRET;
   const { id, name, username } = user;
-  console.log("secret, id, name, username ==>", secret, id, name, username); // TODO: remove this
   return await jwt.sign({ id, name, username }, secret, {
     expiresIn
   });
@@ -32,7 +31,6 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  console.log("req.body ==>", req.body); // TODO: remove this
 
   const user = await req.context.models.User.scope("withPassword").findOne({
     where: { username: req.body.username }
