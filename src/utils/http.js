@@ -1,5 +1,3 @@
-import { API_URL } from "./constants";
-
 async function http(url = "", method = "GET", data = "") {
   const options = {
     method: method,
@@ -10,7 +8,7 @@ async function http(url = "", method = "GET", data = "") {
     body: method === "GET" ? undefined : JSON.stringify(data)
   };
 
-  const response = await fetch(API_URL + url, options);
+  const response = await fetch(process.env.REACT_APP_API_URI + url, options);
 
   return new Promise(async (resolve, reject) => {
     if (response.status === 200) return resolve(response.json());
