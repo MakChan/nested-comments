@@ -3,13 +3,13 @@ import React, { useState } from "react";
 import { Box, Text, Flex } from "rebass";
 import TimeAgo from "react-timeago";
 
-import http from "../utils/http";
+import http from "../../utils/http";
 
-import Reply from "./Reply";
-import TextWithEdit from "./TextWithEdit";
+import Reply from "../Reply";
+import TextWithEdit from "../TextWithEdit";
 
-import LinkButton from "./LinkButton";
-import CommentLoader from "./ContentLoader";
+import LinkButton from "../LinkButton";
+import CommentLoader from "../ContentLoader";
 
 const Comment = ({ comment, hideChildComments, addChildComment, userId }) => {
   const [showReply, toggleReply] = useState(false);
@@ -79,7 +79,6 @@ const Comment = ({ comment, hideChildComments, addChildComment, userId }) => {
                 </Flex>
               </>
             )}
-
             {showReply && (
               <Reply handleSubmit={replyComment} autoFocus={true} />
             )}

@@ -6,14 +6,15 @@ import TimeAgo from "react-timeago";
 
 import { useAuthContext } from "../utils/authContext";
 import http from "../utils/http";
-import Comment from "../components/Comment";
+import Comments from "../components/Comments";
+import TreeComments from "../components/TreeComments";
 import Reply from "../components/Reply";
 import Error from "../components/Error";
 import TextWithEdit from "../components/TextWithEdit";
 
 import LinkButton from "../components/LinkButton";
 
-function PostPage() {
+function PostPage({ isTreeView }) {
   const { userState } = useAuthContext();
   const history = useHistory();
   let { postId } = useParams();
@@ -25,7 +26,8 @@ function PostPage() {
   useEffect(() => {
     const fetchPost = async postId => {
       try {
-        const result = await http("posts/" + postId);
+        const url = "posts/" + postId + (isTreeView ? "/tree" : "");
+        const result = await http(url);
         setPost(result);
       } catch (e) {
         if (e.status === 400 || e.status === 404) history.push("/not-found");
@@ -45,59 +47,6 @@ function PostPage() {
     result.authorName = userState.user.username;
 
     const comments = [result, ...post.comments];
-    setPost({ ...post, comments: comments });
-  };
-
-  const addChildComment = async (parentComment, text) => {
-    const comments = post.comments.slice();
-    const index = comments.findIndex(com => com.id === parentComment.id);
-
-    let result = await http("comments/" + post.id, "POST", {
-      parentComment,
-      text
-    });
-    result.authorName = userState.user.username;
-
-    comments.splice(index + 1, 0, result);
-    setPost({ ...post, comments: comments });
-
-    return true;
-  };
-
-  const hideChildComments = comment => {
-    const comments = post.comments.slice();
-    const index = comments.findIndex(com => com.id === comment.id);
-
-    if (!comment.hideContent) {
-      comments[index].childrenCount = 0;
-      comments[index].hideContent = true;
-      for (let i = index + 1; i < comments.length; i++) {
-        if (
-          comments[i].path[0] === comment.path[0] &&
-          comments[i].depth > comment.depth
-        ) {
-          comments[i].hide = true;
-          if (!comments[i].hiddenBy) {
-            comments[i].hiddenBy = comment.id;
-          }
-          comments[index].childrenCount += 1;
-        } else break;
-      }
-    } else {
-      comments[index].hideContent = false;
-      for (let i = index + 1; i < comments.length; i++) {
-        if (
-          comments[i].path[0] === comment.path[0] &&
-          comments[i].depth > comment.depth
-        ) {
-          if (comments[i].hiddenBy === comment.id) {
-            comments[i].hide = false;
-            comments[i].hiddenBy = undefined;
-          }
-        } else break;
-      }
-    }
-
     setPost({ ...post, comments: comments });
   };
 
@@ -144,21 +93,19 @@ function PostPage() {
       <Reply handleSubmit={addComment} />
       <hr />
 
-      <Box mb={5}>
-        {post.comments &&
-          post.comments.map(
-            comment =>
-              !comment.hide && (
-                <Comment
-                  comment={comment}
-                  key={comment.id}
-                  hideChildComments={hideChildComments}
-                  addChildComment={addChildComment}
-                  userId={userState.user.id}
-                />
-              )
-          )}
-      </Box>
+      {isTreeView ? (
+        <TreeComments
+          comments={post.comments}
+          user={userState.user}
+          postId={post.id}
+        />
+      ) : (
+        <Comments
+          comments={post.comments}
+          user={userState.user}
+          postId={post.id}
+        />
+      )}
     </>
   );
 }

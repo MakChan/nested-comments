@@ -1,7 +1,45 @@
 import { Router } from "express";
-import { requiresLogin } from "../utils";
+import { requiresLogin, arrangeIntoTree } from "../utils";
 
 const router = Router();
+
+const withCommentsQuery = postId => `
+  WITH RECURSIVE cte (path, pathString, id, "userId", "authorName", "createdAt", "updatedAt", depth, text, "postId", "parentId") AS (
+    SELECT ARRAY[C1.id], 
+      C1.id::text,
+      C1.id,
+      "userId",
+      users.name,
+      C1."createdAt",
+      C1."updatedAt",
+      depth,
+      text,
+      "postId",
+      "parentId"
+    FROM comments C1
+    INNER JOIN users ON ("userId" = users.id)
+    WHERE "parentId" IS NULL AND "postId" = ${postId}
+
+    UNION ALL
+
+    SELECT cte.path || comments.id,
+      cte.pathString || comments.id,
+      comments.id,
+      "comments"."userId",
+      users.name,
+      "comments"."createdAt",
+      "comments"."updatedAt",
+      comments.depth,
+      comments.text,
+      "comments"."postId",
+      "comments"."parentId"
+    FROM comments
+    INNER JOIN users ON ("comments"."userId" = users.id)
+    JOIN cte ON "comments"."parentId" = cte.id
+  )
+  SELECT * FROM cte
+  ORDER BY path;    
+`;
 
 router.get("/", async (req, res) => {
   const posts = await req.context.models.Post.findAll({
@@ -71,43 +109,7 @@ router.get("/:postId", async (req, res) => {
   if (!post)
     return res.status(404).send({ message: "No post with this identifier." });
 
-  const query = `
-    WITH RECURSIVE cte (path, pathString, id, "userId", "authorName", "createdAt", "updatedAt", depth, text, "postId", "parentId") AS (
-      SELECT ARRAY[C1.id], 
-        C1.id::text,
-        C1.id,
-        "userId",
-        users.name,
-        C1."createdAt",
-        C1."updatedAt",
-        depth,
-        text,
-        "postId",
-        "parentId"
-      FROM comments C1
-		  INNER JOIN users ON ("userId" = users.id)
-      WHERE "parentId" IS NULL AND "postId" = ${postId}
-
-      UNION ALL
-
-      SELECT cte.path || comments.id,
-        cte.pathString || comments.id,
-        comments.id,
-        "comments"."userId",
-        users.name,
-        "comments"."createdAt",
-        "comments"."updatedAt",
-        comments.depth,
-        comments.text,
-        "comments"."postId",
-        "comments"."parentId"
-      FROM comments
-		  INNER JOIN users ON ("comments"."userId" = users.id)
-      JOIN cte ON "comments"."parentId" = cte.id
-    )
-    SELECT * FROM cte
-    ORDER BY path;    
-  `;
+  const query = withCommentsQuery(postId);
 
   let comments;
   try {
@@ -115,6 +117,35 @@ router.get("/:postId", async (req, res) => {
   } catch (e) {
     return res.status(500).send(e);
   }
+
+  post.setDataValue("comments", comments);
+  return res.send(post);
+});
+
+router.get("/:postId/tree", async (req, res) => {
+  const postId = Number(req.params.postId);
+
+  if (!postId)
+    return res.status(400).send({ message: "Invalid post identifier." });
+
+  const post = await req.context.models.Post.findOne({
+    where: { id: postId },
+    include: [{ model: req.context.models.User }]
+  });
+
+  if (!post)
+    return res.status(404).send({ message: "No post with this identifier." });
+
+  const query = withCommentsQuery(postId);
+
+  let comments;
+  try {
+    [comments] = await req.context.sequelize.query(query);
+  } catch (e) {
+    return res.status(500).send(e);
+  }
+
+  comments = arrangeIntoTree(comments);
 
   post.setDataValue("comments", comments);
   return res.send(post);

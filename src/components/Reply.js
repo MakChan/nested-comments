@@ -8,8 +8,13 @@ import { required } from "../utils/validations";
 
 const Reply = ({ handleSubmit, autoFocus }) => (
   <Form onSubmit={handleSubmit}>
-    {({ handleSubmit }) => (
-      <form onSubmit={handleSubmit}>
+    {({ handleSubmit, form }) => (
+      <form
+        onSubmit={async event => {
+          await handleSubmit(event);
+          form.reset();
+        }}
+      >
         <Field name="text" validate={required}>
           {({ input, meta }) => (
             <>

@@ -6,12 +6,14 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Post from "./pages/Post";
-import CreatePost from "./pages/CreatePost"
+import CreatePost from "./pages/CreatePost";
 
 import NoMatch from "./components/NoMatch";
 import Header from "./components/Header";
 
 import { useAuthContext } from "./utils/authContext";
+
+const TreeViewPost = () => <Post isTreeView={true} />;
 
 const Container = props => (
   <Box
@@ -38,8 +40,13 @@ function App() {
 
         <GuardedRoute path="/" exact component={Home} />
         <GuardedRoute path="/post/create" exact component={CreatePost} />
-        <GuardedRoute path="/post/:postId" exact component={Post} />
-        
+        <GuardedRoute path="/post/:postId" exact component={TreeViewPost} />
+        <GuardedRoute
+          path="/post/:postId/non_tree_view"
+          exact
+          component={Post}
+        />
+
         <Route component={NoMatch} />
       </Switch>
     </Container>
